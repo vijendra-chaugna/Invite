@@ -1,0 +1,3607 @@
+/* =============================================================================
+   ROYAL WEDDING INVITATION — BOW & BOUQUET THEME
+   Plain Vanilla CSS • Fluid Stage System • Container Query Architecture
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   1. DESIGN TOKENS & CSS VARIABLES
+   ----------------------------------------------------------------------------- */
+:root {
+  /* Color Palette (Derived from watercolor arch & botanical bouquet) */
+  --ivory: #FDF8EC;
+  --cream: #F8EEDC;
+  --cream-dark: #F3E5CD;
+  --gold: #B8923A;
+  --gold-bright: #D9B65A;
+  --gold-dark: #8C6A1F;
+  --gold-light: #F5E2A8;
+  --gold-gradient: linear-gradient(135deg, #8C6A1F 0%, #E6C872 50%, #B8923A 100%);
+  --gold-gradient-text: linear-gradient(135deg, #7A5714 0%, #D9B65A 45%, #F4DC96 55%, #8C6A1F 100%);
+  --gold-glow: 0 4px 18px rgba(184, 146, 58, 0.35);
+
+  /* Bouquet Florals */
+  --rose-pink: #D6457F;
+  --coral: #F08A74;
+  --peach: #F9D9C4;
+  --marigold: #F2A93B;
+  --sage-leaf: #6E9E73;
+  --powder-blue: #BFE0EA;
+
+  /* Typography Colors */
+  --text-primary: #4A2E35;    /* Deep warm plum-brown (high contrast on ivory) */
+  --text-secondary: #7A5A60;  /* Soft romantic plum tone */
+  --text-muted: #9C7E84;
+  --border-gold-subtle: rgba(184, 146, 58, 0.3);
+
+  /* Typography Families */
+  --font-script: 'Italianno', cursive;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-caps: 'Cinzel', serif;
+  --font-sans: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-hindi: 'Tiro Devanagari Hindi', 'Noto Serif Devanagari', serif;
+
+  /* Stage & Safe Zone Defaults (Arch Image Safe Dimensions) */
+  --ar: 0.55815; /* Default 1075 / 1926 */
+  --safe-top: 24%;
+  --safe-bottom: 81%;
+  --safe-left: 17%;
+  --safe-right: 83%;
+
+  /* Transitions */
+  --ease-smooth: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* -----------------------------------------------------------------------------
+   2. GLOBAL RESETS & FOUNDATION
+   ----------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  background-color: var(--ivory);
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background-color: var(--ivory);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body.scroll-locked {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
+/* Accessible hidden utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   3. ENTRANCE SCREEN (Cinematic Video Curtain Overlay)
+   ----------------------------------------------------------------------------- */
+.entrance-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #FDF8EC 30%, #F4E5CC 100%);
+  overflow: hidden;
+  transition: opacity 2s var(--ease-smooth),
+              transform 2s var(--ease-smooth),
+              filter 2s var(--ease-smooth);
+}
+
+.entrance-overlay.dissolving {
+  opacity: 0;
+  transform: scale(1.08);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.entrance-video-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ivory);
+}
+
+.entrance-video {
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100%;
+  width: auto;
+  max-width: 100vw;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+/* Centred "Tap to Open" Prompt (shifted 100px downwards) */
+.entrance-prompt {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% + 100px));
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 20px;
+  transition: transform 0.3s var(--ease-smooth), opacity 0.6s ease;
+}
+
+.entrance-prompt:hover {
+  transform: translate(-50%, calc(-50% + 100px)) scale(1.04);
+}
+
+.entrance-prompt.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, calc(-50% + 100px)) scale(0.92);
+}
+
+.entrance-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 34px;
+  /* Soft white texture radial fade behind text (seamlessly fades out at edges, no hard borders) */
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 100%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  border-radius: 50px;
+  box-shadow: none;
+  transition: transform 0.3s var(--ease-smooth), opacity 0.3s ease;
+}
+
+.entrance-prompt:hover .entrance-pill {
+  transform: scale(1.06);
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0.25) 75%, transparent 100%);
+  box-shadow: none;
+}
+
+.entrance-pill-sparkle {
+  color: #7A5515;
+  font-size: 11px;
+  animation: sparkleTwinkle 2s ease-in-out infinite alternate;
+  filter: drop-shadow(0 1px 3px rgba(253, 248, 236, 0.9));
+}
+
+@keyframes sparkleTwinkle {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  100% { transform: scale(1.2); opacity: 1; }
+}
+
+.entrance-btn-label {
+  font-family: var(--font-caps);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #3E242B; /* Rich darker plum-brown for crystal clarity */
+  text-shadow: 0 1px 4px rgba(253, 248, 236, 0.95), 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+/* Skip direct fallback button */
+.entrance-skip {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10;
+  background: rgba(253, 248, 236, 0.85);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border-gold-subtle);
+  color: var(--text-secondary);
+  font-family: var(--font-caps);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.entrance-skip:hover {
+  background: var(--gold-bright);
+  color: #FFFFFF;
+}
+
+/* Cinematic Flash Bloom Overlay */
+.entrance-bloom {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 246, 224, 0.95) 0%, rgba(217, 182, 90, 0.4) 70%, transparent 100%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.entrance-bloom.bloom-active {
+  animation: bloomFlash 1.6s ease-out forwards;
+}
+
+@keyframes bloomFlash {
+  0% { opacity: 0; }
+  25% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+
+/* -----------------------------------------------------------------------------
+   5. THE STAGE SYSTEM & LETTERBOX ARCHITECTURE (Core Requirement)
+   ----------------------------------------------------------------------------- */
+.page-container {
+  width: 100%;
+  scroll-behavior: smooth;
+  scroll-snap-type: none; /* continuous seamless scroll across all devices */
+  overflow-y: visible;
+  overflow-x: hidden;
+  height: auto;
+  min-height: 100vh;
+}
+
+.page-section {
+  width: 100vw;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  /* Seamless letterbox matting */
+  background: var(--ivory) radial-gradient(circle at center, #FDF8EC 55%, #F5E8D2 100%);
+  margin: 0;
+  padding: 0;
+}
+
+/* The Stage Box: centered invitation card */
+.stage {
+  --ar: 0.55815; /* natural width / height of background image */
+  position: relative;
+  width: min(100vw, calc(100dvh * var(--ar)));
+  height: min(100dvh, calc(100vw / var(--ar)));
+  max-width: 100vw;
+  max-height: 100dvh;
+  container-type: size;
+  overflow: hidden;
+  background-color: var(--ivory);
+  box-shadow: 0 16px 50px rgba(74, 46, 53, 0.16), 0 2px 12px rgba(74, 46, 53, 0.08);
+  margin: 0;
+}
+
+/* Mobile View: Seamlessly connect all sections end-to-end with ZERO gaps */
+@media (max-width: 768px) {
+  .page-container {
+    scroll-snap-type: none; /* continuous seamless scroll */
+    height: auto;
+    overflow-y: visible;
+  }
+
+  .page-section {
+    min-height: auto;
+    height: calc(100vw / var(--ar, 0.55815));
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    background: var(--ivory);
+    display: block;
+  }
+
+  .page-section#couple,
+  .page-section#story,
+  .page-section#events,
+  .page-section#rsvp {
+    height: auto;
+    min-height: 100dvh;
+  }
+
+  .page-section#footer {
+    height: auto;
+    min-height: auto;
+  }
+
+  .stage {
+    width: 100vw;
+    height: 100%;
+    max-width: 100vw;
+    max-height: none;
+    box-shadow: none; /* remove desktop card shadow on mobile */
+    border-radius: 0;
+    margin: 0;
+    display: block;
+  }
+
+  .stage#coupleStage,
+  .stage#storyStage,
+  .stage#eventsStage,
+  .stage#rsvpStage {
+    height: auto;
+    min-height: 100dvh;
+  }
+
+  .stage#footerStage {
+    height: auto;
+    min-height: auto;
+  }
+
+  /* Entrance Video Mobile View: Expand to full screen height */
+  .entrance-video-container {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .entrance-video {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-width: 100vw;
+    max-height: 100dvh;
+    object-fit: cover;
+  }
+
+  /* Force "(✦ Tap to Open Invitation ✦)" in a single line on mobile */
+  .entrance-prompt {
+    width: 100%;
+    max-width: 100vw;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .entrance-pill {
+    white-space: nowrap;
+    gap: 8px;
+    padding: 10px 18px;
+  }
+
+  .entrance-btn-label {
+    white-space: nowrap;
+    font-size: clamp(11.5px, 3.4vw, 13.75px); /* Increased by 25% */
+    letter-spacing: 0.14em;
+  }
+
+  .entrance-pill-sparkle {
+    font-size: 12.5px; /* Increased by 25% */
+  }
+}
+
+/* Stage Background Image: fills stage exactly with 0% cropping */
+.stage-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  z-index: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Interactive Canvas layer over stage (hero petals, sparkles) */
+.stage-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* -----------------------------------------------------------------------------
+   6. SAFE CONTENT ZONES (Calculated inside .stage container)
+   ----------------------------------------------------------------------------- */
+/* Upper Arch Zone: (17% to 24.5% y, 28% to 72% x) */
+.upper-arch-zone {
+  position: absolute;
+  top: 17%;
+  height: 7.5%;
+  left: 28%;
+  right: 28%;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: auto;
+}
+
+/* Main Safe Box: (24% to 81% y, 17% to 83% x) */
+.safe {
+  position: absolute;
+  top: var(--safe-top, 24%);
+  bottom: calc(100% - var(--safe-bottom, 81%));
+  left: var(--safe-left, 17%);
+  right: calc(100% - var(--safe-right, 83%));
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  text-align: center;
+  pointer-events: auto;
+  padding: 1cqh 0;
+}
+
+/* Lower Centre Zone: (81% to 88% y, 30% to 70% x) */
+.lower-center-zone {
+  position: absolute;
+  top: 81%;
+  height: 7.5%;
+  left: 30%;
+  right: 30%;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: auto;
+}
+
+/* -----------------------------------------------------------------------------
+   7. TYPOGRAPHY SYSTEM (Scaled via cqw / cqh container query units)
+   ----------------------------------------------------------------------------- */
+.sacred-shloka {
+  font-family: var(--font-hindi);
+  font-size: clamp(10px, 3.2cqw, 14px);
+  color: var(--gold-dark);
+  letter-spacing: 0.05em;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.small-caps-tag {
+  font-family: var(--font-caps);
+  font-size: clamp(9px, 2.7cqw, 12px);
+  color: var(--text-secondary);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-top: 0.4cqh;
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 6.2cqw, 32px);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+}
+
+.safe-caption {
+  font-family: var(--font-sans);
+  font-size: clamp(10px, 2.8cqw, 13px);
+  color: var(--text-secondary);
+  margin-top: 0.6cqh;
+  letter-spacing: 0.04em;
+}
+
+.safe-micro-tag {
+  font-family: var(--font-caps);
+  font-size: clamp(8px, 2.4cqw, 11px);
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.sacred-blessing-small {
+  font-family: var(--font-hindi);
+  font-size: clamp(10px, 2.9cqw, 13px);
+  color: var(--gold-dark);
+  letter-spacing: 0.06em;
+}
+
+/* Ornamental Filigree Divider */
+.gold-filigree-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 75%;
+  margin: 1.2cqh auto;
+}
+
+.gold-filigree-divider.mini {
+  margin: 0.8cqh auto;
+  width: 60%;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+}
+
+.divider-gem {
+  color: var(--gold);
+  font-size: clamp(10px, 2.8cqw, 14px);
+}
+
+/* -----------------------------------------------------------------------------
+   8. SECTION 1: HERO (Cinematic Dolly Zoom & Line-by-Line Reveal)
+   ----------------------------------------------------------------------------- */
+#heroStage {
+  overflow: hidden;
+}
+
+/* Cinematic Dolly Zoom on background image */
+#heroStage .stage-bg {
+  transform: scale(1.15);
+  filter: blur(5px) brightness(1.06);
+  transition: transform 2.6s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 2.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, filter;
+  transform-origin: center center;
+}
+
+#hero.hero-revealed #heroStage .stage-bg {
+  transform: scale(1);
+  filter: blur(0px) brightness(1);
+}
+
+.hero-safe {
+  top: 15%;
+  bottom: 11%;
+  left: 11%;
+  right: 11%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0;
+}
+
+.hero-center-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+}
+
+/* Base Line-by-Line reveal animation state */
+.hero-line {
+  opacity: 0;
+  transform: translateY(22px);
+  filter: blur(6px);
+  transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+              filter 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform, filter;
+}
+
+#hero.hero-revealed .hero-line,
+.hero-line.in-view {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0px);
+}
+
+/* Precise Stagger Delays: Line 1 through Line 8 */
+.hero-line-1 { transition-delay: 0.35s; } /* Shloka */
+.hero-line-2 { transition-delay: 0.65s; } /* Invitation tag */
+.hero-line-3 { transition-delay: 0.95s; } /* Groom: Aarav */
+.hero-line-4 { transition-delay: 1.20s; } /* & */
+.hero-line-5 { transition-delay: 1.45s; } /* Bride: Ananya */
+.hero-line-6 { transition-delay: 1.75s; } /* Gold divider */
+.hero-line-7 { transition-delay: 2.00s; } /* Invitation text */
+.hero-line-8 { transition-delay: 2.25s; } /* Scroll cue */
+
+/* Line 1: Sacred Shloka (+10%) */
+.hero-shloka {
+  font-family: var(--font-hindi);
+  font-size: clamp(12.65px, 3.52cqw, 16.5px);
+  color: var(--gold-dark);
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  margin-bottom: calc(1.3cqh + 28px);
+  display: block;
+}
+
+#hero.hero-revealed .hero-line-1,
+.hero-line-1.in-view {
+  animation: shlokaAuraPulse 2.2s ease-out 0.35s 1 forwards;
+}
+
+@keyframes shlokaAuraPulse {
+  0% {
+    text-shadow: 0 0 16px rgba(217, 182, 90, 0.8), 0 0 30px rgba(217, 182, 90, 0.4);
+  }
+  100% {
+    text-shadow: 0 0 0px transparent;
+  }
+}
+
+/* Line 2: Invitation Tag (+10%) */
+.hero-invite-tag {
+  font-family: var(--font-caps);
+  font-size: clamp(9.35px, 2.64cqw, 12.1px);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 0.9cqh;
+  display: block;
+}
+
+/* Lines 3, 4, 5: Couple Names & Ampersand (+10%) */
+.names-wrapper {
+  margin: 0.45cqh 0 0.9cqh;
+}
+
+.hero-names {
+  font-family: var(--font-script);
+  font-size: clamp(46.2px, 14.85cqw, 70.4px);
+  line-height: 1.15;
+  font-weight: 400;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-primary);
+}
+
+.hero-names .groom-name,
+.hero-names .bride-name {
+  background: var(--gold-gradient-text);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(184, 146, 58, 0.25));
+  display: inline-block;
+}
+
+#hero.hero-revealed .hero-line-3,
+.hero-line-3.in-view {
+  animation: goldTextFoilSweep 2.4s ease-out 0.95s 1 forwards;
+}
+
+#hero.hero-revealed .hero-line-5,
+.hero-line-5.in-view {
+  animation: goldTextFoilSweep 2.4s ease-out 1.45s 1 forwards;
+}
+
+@keyframes goldTextFoilSweep {
+  0% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+  100% {
+    background-position: 0% center;
+  }
+}
+
+/* Line 4: Gold Ampersand Pop (+10%) */
+.gold-ampersand {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(18.7px, 5.72cqw, 28.6px);
+  color: var(--rose-pink);
+  margin: -0.2cqh 0;
+  display: inline-block;
+}
+
+.hero-line-4 {
+  transform: translateY(14px) scale(0.85);
+}
+
+#hero.hero-revealed .hero-line-4,
+.hero-line-4.in-view {
+  transform: translateY(0) scale(1);
+}
+
+/* Line 6: Gold Filigree Divider (+10%) */
+.gold-filigree-divider.hero-divider {
+  width: 61%;
+  margin: 0.9cqh auto 1.1cqh;
+}
+
+.hero-divider .divider-line {
+  transform: scaleX(0);
+  transform-origin: center;
+  height: 1.1px;
+  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1) 1.8s;
+}
+
+#hero.hero-revealed .hero-divider .divider-line,
+.hero-divider.in-view .divider-line {
+  transform: scaleX(1);
+}
+
+.hero-divider .divider-gem {
+  display: inline-block;
+  font-size: clamp(11px, 3.1cqw, 15.5px);
+  transform: scale(0) rotate(-45deg);
+  transition: transform 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) 1.7s;
+}
+
+#hero.hero-revealed .hero-divider .divider-gem,
+.hero-divider.in-view .divider-gem {
+  transform: scale(1) rotate(0deg);
+}
+
+/* Line 7: Invitation subtext (+10%) */
+.hero-invitation-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(14.3px, 3.85cqw, 17.6px);
+  line-height: 1.4;
+  color: var(--text-secondary);
+  max-width: 92%;
+  margin: 0 0 calc(2.4cqh + 28px) 0;
+}
+
+/* Line 8: Scroll Cue (+10%) */
+.scroll-cue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  gap: 5px;
+  color: var(--gold-dark);
+  transition: transform 0.25s ease;
+}
+
+.scroll-cue:hover {
+  transform: translateY(2px);
+}
+
+.scroll-cue-text {
+  font-family: var(--font-caps);
+  font-size: clamp(9.35px, 2.64cqw, 12.1px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.scroll-arrow {
+  width: 18px;
+  height: 18px;
+  animation: bounceDown 1.8s ease-in-out infinite;
+}
+
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+/* -----------------------------------------------------------------------------
+   9. SECTION 2: INVITATION MESSAGE (+20% Dimension & Content Sizing)
+   ----------------------------------------------------------------------------- */
+.message-safe {
+  top: 12%;
+  bottom: 9%;
+  left: 8%;
+  right: 8%;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+}
+
+.message-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+}
+
+.message-ganesh-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.2cqh;
+}
+
+.message-ganesh-img {
+  width: auto;
+  height: clamp(58px, 14.4cqw, 84px);
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 12px rgba(214, 69, 127, 0.22));
+  animation: gentleGaneshFloat 4s ease-in-out infinite alternate;
+}
+
+@keyframes gentleGaneshFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-3.5px); }
+}
+
+.message-shloka-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3cqh;
+  margin-bottom: 1.8cqh;
+}
+
+.message-shloka-line {
+  font-family: var(--font-hindi);
+  font-size: clamp(15.5px, 4.3cqw, 21px);
+  color: var(--gold-dark);
+  letter-spacing: 0.05em;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+  white-space: normal;
+}
+
+.message-lead {
+  font-family: var(--font-serif);
+  font-size: clamp(15.5px, 4.2cqw, 20.5px);
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  max-width: 96%;
+  margin: 0 auto 1.9cqh;
+  text-align: center;
+}
+
+.couple-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3cqh;
+  text-align: center;
+  width: 100%;
+}
+
+.message-person-name {
+  font-family: var(--font-script);
+  font-size: clamp(41px, 11cqw, 55px);
+  font-weight: 400;
+  color: var(--gold-dark);
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+.message-person-lineage {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(16.5px, 4.3cqw, 21px);
+  color: var(--text-secondary);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.message-connector {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(27px, 7.2cqw, 36px);
+  color: var(--rose-pink);
+  margin: 0.6cqh 0;
+  line-height: 1;
+}
+
+.gold-filigree-divider.message-divider {
+  width: 60%;
+  margin: 1.8cqh auto 1.7cqh;
+}
+
+.message-divider .divider-gem {
+  font-size: clamp(12px, 3.4cqw, 17px);
+}
+
+.message-divider .divider-line {
+  height: 1.2px;
+}
+
+.message-closing-quote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(17.4px, 4.7cqw, 21.6px);
+  line-height: 1.45;
+  color: var(--text-primary);
+  max-width: 96%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* -----------------------------------------------------------------------------
+   10. SECTION 3: SCRATCH CARD + COUNTDOWN
+   ----------------------------------------------------------------------------- */
+#countdown .upper-arch-zone,
+#countdown .countdown-safe {
+  transform: translateY(-50px) scale(1.2);
+  transform-origin: center top;
+}
+
+.countdown-safe {
+  justify-content: space-between;
+}
+
+.scratch-section-header {
+  margin-bottom: 0.6cqh;
+}
+
+/* Scratch Box */
+.scratch-card-wrapper {
+  position: relative;
+  width: 90%;
+  height: 20.5cqh;
+  min-height: 130px;
+  max-height: 170px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(74, 46, 53, 0.14);
+}
+
+/* Revealed under-layer */
+.scratch-reveal-card {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #FFFDF8 0%, #FAF0DF 100%);
+  border: 2px solid var(--gold-bright);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.reveal-badge {
+  font-family: var(--font-caps);
+  font-size: clamp(8px, 2.3cqw, 10px);
+  letter-spacing: 0.2em;
+  color: var(--rose-pink);
+  text-transform: uppercase;
+}
+
+.reveal-day {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(12px, 3.3cqw, 15px);
+  color: var(--text-secondary);
+}
+
+.reveal-date-big {
+  font-family: var(--font-caps);
+  font-size: clamp(16px, 4.5cqw, 22px);
+  font-weight: 600;
+  color: var(--gold-dark);
+  letter-spacing: 0.12em;
+  margin: 3px 0;
+}
+
+.reveal-details {
+  font-family: var(--font-sans);
+  font-size: clamp(9px, 2.5cqw, 11px);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reveal-venue {
+  color: var(--text-muted);
+}
+
+/* Scratch Foil Canvas */
+.scratch-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+  z-index: 5;
+  border-radius: 12px;
+  transition: opacity 0.7s var(--ease-smooth);
+}
+
+.scratch-hint {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  font-family: var(--font-caps);
+  font-size: clamp(8px, 2.2cqw, 10px);
+  letter-spacing: 0.15em;
+  color: #7A5510;
+  background: rgba(255, 248, 230, 0.9);
+  padding: 3px 8px;
+  border-radius: 10px;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity 0.5s ease;
+}
+
+/* Countdown Display */
+.countdown-container {
+  width: 100%;
+  margin-top: 1cqh;
+}
+
+.countdown-label {
+  font-family: var(--font-serif);
+  font-size: clamp(16px, 4.8cqw, 22px);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-transform: none;
+  margin-bottom: 0.8cqh;
+}
+
+.countdown-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.countdown-tile {
+  background: rgba(253, 248, 236, 0.95);
+  border: 1px solid var(--gold-bright);
+  border-radius: 8px;
+  padding: 6px 8px;
+  min-width: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(74, 46, 53, 0.08);
+}
+
+.countdown-num {
+  font-family: var(--font-serif);
+  font-size: clamp(16px, 4.6cqw, 22px);
+  font-weight: 700;
+  color: var(--gold-dark);
+  line-height: 1;
+}
+
+.countdown-unit {
+  font-family: var(--font-sans);
+  font-size: clamp(7px, 2cqw, 9px);
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.countdown-colon {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--gold-bright);
+  font-size: 16px;
+}
+
+.countdown-celebration {
+  font-family: var(--font-serif);
+  font-size: clamp(14px, 3.8cqw, 18px);
+  font-weight: 600;
+  color: var(--gold-dark);
+  margin-top: 6px;
+}
+
+/* -----------------------------------------------------------------------------
+   11. SECTION 4: COUPLE INTRO
+   ----------------------------------------------------------------------------- */
+.page-section#couple {
+  height: auto !important;
+  min-height: 100dvh;
+  min-height: 100vh;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow: visible !important;
+}
+
+#coupleStage {
+  width: min(100vw, calc(100dvh * var(--ar, 0.55815)));
+  min-height: 100dvh;
+  height: auto !important;
+  max-height: none !important;
+  background: linear-gradient(165deg, #FFFDF9 0%, #FDF4E7 48%, #F7E5DE 100%);
+  position: relative;
+  overflow: visible;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  container-type: inline-size;
+}
+
+#coupleStage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 18% 22%, rgba(217, 182, 90, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 82% 78%, rgba(214, 69, 127, 0.08) 0%, transparent 45%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+#couple .couple-safe {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  max-width: 92%;
+  margin: 0 auto;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 52px 0 60px !important;
+  box-sizing: border-box;
+  z-index: 10;
+  transform: none;
+}
+
+/* Merger Floral Divider Images */
+.couple-merger-divider {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.couple-merger-divider.top-merger {
+  top: 0;
+  transform: translateY(-50%);
+}
+
+.couple-merger-divider.bottom-merger {
+  bottom: 0;
+  transform: translateY(50%) rotate(180deg);
+}
+
+.merger-divider-img {
+  width: 82%;
+  max-width: 440px;
+  height: auto;
+  filter: drop-shadow(0 2px 6px rgba(74, 46, 53, 0.12));
+  display: block;
+}
+
+/* Ensure reveal items inside couple intro are always visible */
+#couple .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+.couple-header {
+  margin-bottom: 38px;
+  text-align: center;
+}
+
+#couple .section-title {
+  font-size: clamp(28px, 8.8cqw, 45px);
+}
+
+/* Single-Column Couple Container */
+.couple-column-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* Individual Couple Block - Arch Image on top of text */
+.couple-person-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.couple-arch-frame {
+  position: relative;
+  flex-shrink: 0;
+  width: 31cqw;
+  height: 40cqw;
+  max-width: 132px;
+  max-height: 162px;
+  border-radius: 50% 50% 14px 14px;
+  overflow: hidden;
+  border: 2px solid var(--gold-bright);
+  box-shadow: 0 8px 22px rgba(74, 46, 53, 0.16);
+  margin-bottom: 4px;
+}
+
+.couple-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.couple-details {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.couple-role-tag {
+  font-family: var(--font-caps);
+  font-size: clamp(11.5px, 3.1cqw, 14px);
+  letter-spacing: 0.2em;
+  color: var(--rose-pink);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.couple-name {
+  font-family: var(--font-script);
+  font-size: clamp(36px, 10.2cqw, 50px);
+  color: var(--gold-dark);
+  line-height: 1.12;
+  margin-bottom: 5px;
+}
+
+.couple-tagline {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(14px, 3.8cqw, 18px);
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+}
+
+.couple-parents {
+  font-family: var(--font-sans);
+  font-size: clamp(11.5px, 3cqw, 14.5px);
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.couple-bio {
+  font-family: var(--font-serif);
+  font-size: clamp(13px, 3.5cqw, 16px);
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--text-primary);
+  max-width: 90%;
+  margin-top: 8px;
+}
+
+/* Subtle Royal Divider with distinctive clear spacing */
+.couple-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70%;
+  position: relative;
+  margin: 38px 0;
+}
+
+.couple-divider::before,
+.couple-divider::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--border-gold-subtle), transparent);
+}
+
+/* Couple Spark Button (Interactive Rose Flower) */
+.couple-spark-btn {
+  position: relative;
+  background: transparent;
+  border: none;
+  padding: 6px;
+  margin: 0 16px;
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  outline: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 5;
+}
+
+.couple-spark-btn:hover {
+  transform: scale(1.15) rotate(5deg);
+}
+
+.couple-spark-btn:active {
+  transform: scale(0.92);
+}
+
+/* Pulsing aura ring behind the flower to invite clicking */
+.couple-spark-btn .spark-aura {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(214, 69, 127, 0.3) 0%, rgba(217, 182, 90, 0.2) 50%, transparent 72%);
+  opacity: 0.7;
+  animation: sparkAuraPulse 2.8s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes sparkAuraPulse {
+  0% { transform: scale(0.85); opacity: 0.35; }
+  100% { transform: scale(1.35); opacity: 0.95; }
+}
+
+.couple-divider-rose {
+  width: clamp(32px, 8.5cqw, 42px);
+  height: clamp(32px, 8.5cqw, 42px);
+  object-fit: contain;
+  display: block;
+  margin: 0;
+  filter: drop-shadow(0 3px 10px rgba(184, 40, 75, 0.48));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
+  animation: gentleRoseFloat 3.8s ease-in-out infinite alternate;
+}
+
+.couple-spark-btn:hover .couple-divider-rose {
+  filter: drop-shadow(0 6px 14px rgba(184, 40, 75, 0.65));
+}
+
+/* Pop bounce animation when tapped */
+.couple-spark-btn.spark-popped .couple-divider-rose {
+  animation: roseSparkPop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes roseSparkPop {
+  0% { transform: scale(0.8); }
+  45% { transform: scale(1.42) rotate(14deg); }
+  75% { transform: scale(0.95) rotate(-4deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Subtle "Tap to Celebrate" micro-tag below */
+.spark-hint-tag {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--font-caps);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rose-pink);
+  opacity: 0.75;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.9);
+}
+
+.couple-spark-btn:hover .spark-hint-tag {
+  opacity: 1;
+  transform: translateX(-50%) translateY(2px);
+  color: var(--burgundy-deep);
+}
+
+.divider-gem {
+  color: var(--gold-bright);
+  font-size: 16px;
+  padding: 0 12px;
+}
+
+/* -----------------------------------------------------------------------------
+   DECORATIVE BOTANICAL BACKGROUND FLOWERS (Couple & Story Sections)
+   ----------------------------------------------------------------------------- */
+.stage-deco-flora {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  user-select: none;
+  transition: transform 0.8s ease;
+  will-change: transform;
+}
+
+.deco-flower-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 16px rgba(184, 146, 58, 0.16));
+}
+
+/* Couple Intro Section Placements */
+/* Flower 1: Top-Left Arch Corner */
+.deco-flower-top-left {
+  top: 7%;
+  left: 3%;
+  width: clamp(75px, 20cqw, 105px);
+  transform: rotate(-12deg);
+  opacity: 0.82;
+  animation: floraSwayLeft 6s ease-in-out infinite alternate;
+}
+
+/* Flower 2: Mid-Right Border by Bride Card */
+.deco-flower-mid-right {
+  top: 48%;
+  right: 2%;
+  width: clamp(80px, 22cqw, 115px);
+  transform: rotate(15deg);
+  opacity: 0.78;
+  animation: floraSwayRight 7s ease-in-out infinite alternate;
+}
+
+/* Flower 3: Bottom-Left Corner above merger divider */
+.deco-flower-bottom-left {
+  bottom: 5%;
+  left: 2%;
+  width: clamp(72px, 19cqw, 100px);
+  transform: rotate(-18deg);
+  opacity: 0.75;
+  animation: floraSwayLeft 6.5s ease-in-out infinite alternate 1s;
+}
+
+/* Couple Story Section Placements */
+/* Flower 4: Top-Right of Story Timeline Header */
+.deco-flower-story-top-right {
+  top: 4%;
+  right: 3%;
+  width: clamp(82px, 22cqw, 118px);
+  transform: rotate(18deg);
+  opacity: 0.8;
+  animation: floraSwayRight 6.8s ease-in-out infinite alternate;
+}
+
+/* Flower 5: Mid-Left of Timeline (Chapters 2-3) */
+.deco-flower-story-mid-left {
+  top: 45%;
+  left: 1%;
+  width: clamp(78px, 21cqw, 110px);
+  transform: rotate(-14deg);
+  opacity: 0.76;
+  animation: floraSwayLeft 7.2s ease-in-out infinite alternate 0.5s;
+}
+
+/* Flower 6: Bottom-Right of Timeline (Chapter 4) */
+.deco-flower-story-bottom-right {
+  bottom: 6%;
+  right: 2%;
+  width: clamp(84px, 23cqw, 120px);
+  transform: rotate(12deg);
+  opacity: 0.82;
+  animation: floraSwayRight 6.2s ease-in-out infinite alternate 1.5s;
+}
+
+@keyframes floraSwayLeft {
+  0% { transform: translateY(0) rotate(-12deg); }
+  100% { transform: translateY(-8px) rotate(-8deg); }
+}
+
+@keyframes floraSwayRight {
+  0% { transform: translateY(0) rotate(15deg); }
+  100% { transform: translateY(-7px) rotate(19deg); }
+}
+
+/* -----------------------------------------------------------------------------
+   12. SECTION 5: COUPLE STORY (ALTERNATING ZIG-ZAG TIMELINE)
+   ----------------------------------------------------------------------------- */
+.page-section#story {
+  height: auto !important;
+  min-height: 100dvh;
+  min-height: 100vh;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow: visible !important;
+  background: linear-gradient(170deg, #FFFDF8 0%, #FCEBD9 48%, #F7D6DE 100%);
+}
+
+#storyStage {
+  width: min(100vw, calc(100dvh * var(--ar, 0.55815)));
+  min-height: 100dvh;
+  height: auto !important;
+  max-height: none !important;
+  /* Champagne Sunset Glow: Soft Ivory -> Warm Peach -> Delicate Rose-Blush */
+  background: linear-gradient(170deg, #FFFDF8 0%, #FCEBD9 48%, #F7D6DE 100%);
+  position: relative;
+  overflow: visible;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  container-type: inline-size;
+}
+
+#storyStage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 85% 15%, rgba(217, 182, 90, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 15% 85%, rgba(214, 69, 127, 0.09) 0%, transparent 45%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.story-safe {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  max-width: 93%;
+  margin: 0 auto;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 80px 0 94px !important;
+  box-sizing: border-box;
+  z-index: 10;
+  transform: none !important;
+}
+
+#story .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+#story .section-title {
+  font-size: clamp(28px, 8.8cqw, 45px);
+}
+
+#story .safe-caption {
+  font-size: clamp(12.5px, 3.8cqw, 17px);
+  margin-top: 4px;
+}
+
+.story-header {
+  margin-bottom: clamp(34px, 7.5cqw, 46px);
+  text-align: center;
+}
+
+/* Zig-Zag Timeline Container */
+.zigzag-timeline-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(73px, calc(9cqw + 35px), 90px);
+  padding: 12px 0 20px;
+}
+
+/* Central Golden Spine */
+.zigzag-central-spine {
+  position: absolute;
+  left: 50%;
+  top: 24px;
+  bottom: 24px;
+  width: 2.5px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, 
+    rgba(217, 182, 90, 0.2) 0%, 
+    rgba(217, 182, 90, 0.85) 15%, 
+    rgba(217, 182, 90, 0.85) 85%, 
+    rgba(217, 182, 90, 0.2) 100%
+  );
+  z-index: 1;
+}
+
+/* Zig-Zag Item (Image on one side, Story text on the opposite side) */
+.zigzag-item {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 2;
+}
+
+/* Two distinct sides flanking the central spine */
+.zigzag-side {
+  width: calc(50% - 18px);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.zigzag-side.side-left {
+  justify-content: flex-end;
+}
+
+.zigzag-side.side-right {
+  justify-content: flex-start;
+}
+
+/* Central Milestone Flower Node (Red Rose) */
+.zigzag-node {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(28px, 7.5cqw, 38px);
+  height: clamp(28px, 7.5cqw, 38px);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.node-flower-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 3px 8px rgba(184, 40, 75, 0.45));
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.4s ease;
+  animation: gentleRoseFloat 3.8s ease-in-out infinite alternate;
+}
+
+@keyframes gentleRoseFloat {
+  0% { transform: scale(0.95) rotate(-3deg); }
+  100% { transform: scale(1.05) rotate(3deg); }
+}
+
+.zigzag-item:hover .node-flower-img {
+  transform: scale(1.18) rotate(6deg);
+  filter: drop-shadow(0 5px 12px rgba(184, 40, 75, 0.65));
+}
+
+/* Arched Couple Photo Frame (+20% dimension increase) */
+.zigzag-img-frame {
+  width: clamp(136px, 37cqw, 180px);
+  height: clamp(170px, 47.5cqw, 226px);
+  border-radius: clamp(68px, 18.5cqw, 90px) clamp(68px, 18.5cqw, 90px) 16px 16px;
+  overflow: hidden;
+  border: 2.5px solid var(--gold-bright);
+  box-shadow: 0 12px 28px rgba(74, 46, 53, 0.2);
+  background: #FDF8EC;
+  flex-shrink: 0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.zigzag-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Cardless Story Content Presentation (+20% typography) */
+.zigzag-content,
+.zigzag-card {
+  width: 100%;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 4px 6px;
+  box-shadow: none !important;
+  box-sizing: border-box;
+}
+
+.side-left .zigzag-content,
+.side-left .zigzag-card {
+  text-align: right;
+}
+
+.side-right .zigzag-content,
+.side-right .zigzag-card {
+  text-align: left;
+}
+
+.zigzag-badge {
+  font-family: var(--font-caps);
+  font-size: clamp(10.2px, 3cqw, 13.2px);
+  letter-spacing: 0.16em;
+  color: var(--rose-pink);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+.zigzag-title {
+  font-family: var(--font-serif);
+  font-size: clamp(16.8px, 4.8cqw, 22.2px);
+  font-weight: 600;
+  color: var(--gold-dark);
+  line-height: 1.24;
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.zigzag-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(12.5px, 3.5cqw, 15.6px);
+  line-height: 1.48;
+  color: var(--text-primary);
+  margin: 0;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+/* Story Bottom Merger Floral Divider */
+.story-merger-divider {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.story-merger-divider.bottom-merger {
+  bottom: 0;
+  transform: translateY(50%) rotate(180deg);
+}
+
+/* -----------------------------------------------------------------------------
+   13. SECTION 6: WEDDING EVENTS (CONTINUOUS ROYAL CEREMONIES TIMELINE)
+   ----------------------------------------------------------------------------- */
+.page-section#events {
+  height: auto !important;
+  min-height: 100dvh;
+  min-height: 100vh;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow: visible !important;
+  /* Saffron Dawn & Spiced Champagne */
+  background: linear-gradient(170deg, #FFFDF7 0%, #FEF5E7 45%, #FDE9D6 100%);
+}
+
+#eventsStage {
+  width: min(100vw, calc(100dvh * var(--ar, 0.55815)));
+  min-height: 100dvh;
+  height: auto !important;
+  max-height: none !important;
+  /* Saffron Dawn & Spiced Champagne */
+  background: linear-gradient(170deg, #FFFDF7 0%, #FEF5E7 45%, #FDE9D6 100%);
+  position: relative;
+  overflow: visible;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  container-type: inline-size;
+}
+
+#eventsStage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 85% 15%, rgba(242, 169, 59, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 15% 85%, rgba(214, 69, 127, 0.08) 0%, transparent 45%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.events-safe {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  max-width: 93%;
+  margin: 0 auto;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 80px 0 94px !important;
+  box-sizing: border-box;
+  z-index: 10;
+  transform: none !important;
+}
+
+#events .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+.events-header {
+  margin-bottom: clamp(34px, 7.5cqw, 48px);
+  text-align: center;
+}
+
+.events-eyebrow {
+  display: inline-block;
+  font-family: var(--font-caps);
+  font-size: clamp(8.5px, 2.4cqw, 11px);
+  letter-spacing: 0.2em;
+  color: var(--gold-dark);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+#events .section-title {
+  font-size: clamp(28px, 8.8cqw, 45px);
+  margin-bottom: 4px;
+}
+
+#events .safe-caption {
+  font-size: clamp(12.5px, 3.8cqw, 17px);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Timeline Container */
+.events-timeline-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 8cqw, 48px);
+  padding: 10px 0 20px;
+}
+
+/* Timeline Cards (Cardless Presentation) */
+.event-timeline-card {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.event-card-box {
+  width: 100%;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Grand Wedding Card Highlight */
+.grand-wedding-card .grand-box {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.grand-crown-ribbon {
+  display: inline-block;
+  width: auto;
+  background: var(--gold-gradient);
+  color: #FFFFFF;
+  text-align: center;
+  font-family: var(--font-caps);
+  font-size: clamp(8.5px, 2.4cqw, 11px);
+  letter-spacing: 0.16em;
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  box-shadow: 0 3px 10px rgba(140, 106, 31, 0.3);
+}
+
+/* Event Artwork Display (Free-Floating Watercolor Illustration Without Arch Shape Card) */
+.event-art-frame {
+  position: relative;
+  width: clamp(190px, 56cqw, 280px);
+  height: auto;
+  min-height: auto;
+  border-radius: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 auto 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.grand-art-frame {
+  width: clamp(210px, 64cqw, 320px);
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+.event-art-frame:hover {
+  transform: translateY(-4px);
+  box-shadow: none !important;
+}
+
+.event-art-img {
+  width: 100%;
+  height: auto;
+  max-height: clamp(200px, 56cqw, 290px);
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 10px 22px rgba(184, 146, 58, 0.18));
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.5s ease;
+}
+
+.grand-art-frame .event-art-img {
+  max-height: clamp(230px, 64cqw, 330px);
+  filter: drop-shadow(0 12px 26px rgba(184, 146, 58, 0.26));
+}
+
+.event-art-frame:hover .event-art-img {
+  transform: scale(1.04);
+  filter: drop-shadow(0 16px 30px rgba(184, 146, 58, 0.30));
+}
+
+.event-day-pill {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  margin-top: -8px;
+  z-index: 2;
+  background: rgba(74, 46, 53, 0.90);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #FFFFFF;
+  font-family: var(--font-caps);
+  font-size: clamp(8px, 2.3cqw, 10.5px);
+  letter-spacing: 0.14em;
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(217, 182, 90, 0.8);
+  text-transform: uppercase;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(74, 46, 53, 0.22);
+  white-space: nowrap;
+}
+
+.grand-pill {
+  background: rgba(140, 106, 31, 0.95);
+  border-color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(140, 106, 31, 0.32);
+}
+
+/* Info Pane (Floating Cardless Typography) */
+.event-info-pane {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.event-ceremony-title {
+  font-family: var(--font-serif);
+  font-size: clamp(22px, 6.2cqw, 32px);
+  font-weight: 600;
+  color: var(--gold-dark);
+  line-height: 1.18;
+  margin: 6px 0 3px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.grand-title {
+  color: #7A5714;
+  font-size: clamp(25px, 7.2cqw, 36px);
+}
+
+.event-hindi-tag {
+  font-family: var(--font-hindi);
+  font-size: clamp(12.5px, 3.5cqw, 16px);
+  color: var(--gold);
+  letter-spacing: 0.05em;
+  margin-bottom: 7px;
+}
+
+.event-datetime-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-caps);
+  font-size: clamp(9.5px, 2.6cqw, 12px);
+  letter-spacing: 0.14em;
+  color: var(--rose-pink);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin: 2px 0 10px;
+  padding: 4px 14px;
+  background: rgba(184, 146, 58, 0.08);
+  border: 1px solid rgba(184, 146, 58, 0.28);
+  border-radius: 20px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+.grand-time-badge {
+  background: rgba(140, 106, 31, 0.12);
+  border-color: rgba(140, 106, 31, 0.4);
+  color: #7A5714;
+}
+
+.event-narrative {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(12px, 3.3cqw, 15px);
+  line-height: 1.5;
+  color: var(--text-primary);
+  max-width: 92%;
+  margin: 2px auto 10px;
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.event-meta-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  margin: 4px auto 14px;
+  width: 100%;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  font-size: clamp(11px, 3cqw, 13.5px);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+.meta-row svg {
+  flex-shrink: 0;
+  color: var(--gold-dark);
+}
+
+.dress-row {
+  color: var(--text-secondary);
+  font-size: clamp(10.5px, 2.8cqw, 13px);
+}
+
+.dress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.yellow-dot { background: #F2A93B; }
+.green-dot { background: #2E7D32; }
+.magenta-dot { background: #D6457F; }
+.gold-dot { background: #B8923A; }
+.plum-dot { background: #6A1B9A; }
+
+.event-cta-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+.event-cta-row .btn-event {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 24px;
+  font-family: var(--font-caps);
+  font-size: clamp(8.5px, 2.4cqw, 11px);
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-map {
+  background: var(--ivory);
+  border: 1.5px solid var(--gold-bright);
+  color: var(--gold-dark);
+  box-shadow: 0 3px 10px rgba(74, 46, 53, 0.06);
+}
+
+.btn-map:hover {
+  background: var(--gold-gradient);
+  color: #FFFFFF;
+  border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(184, 146, 58, 0.25);
+}
+
+.btn-cal {
+  background: var(--gold-gradient);
+  border: 1.5px solid transparent;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(184, 146, 58, 0.3);
+}
+
+.btn-cal:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(184, 146, 58, 0.4);
+}
+
+/* Floral Event Divider (Between Event Blocks) */
+.event-floral-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: clamp(24px, 6.8cqw, 40px) auto;
+  pointer-events: none;
+}
+
+.event-divider-img {
+  width: clamp(220px, 62.4cqw, 312px);
+  max-width: 95%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 4px 10px rgba(184, 146, 58, 0.18));
+  opacity: 0.95;
+  transition: transform 0.4s ease;
+}
+
+.event-floral-divider:hover .event-divider-img {
+  transform: scale(1.03);
+}
+
+/* Events Bottom Merger Floral Divider */
+.events-merger-divider {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.events-merger-divider.bottom-merger {
+  bottom: 0;
+  transform: translateY(50%) rotate(180deg);
+}
+
+/* -----------------------------------------------------------------------------
+   14. SECTION 7: PHOTO GALLERY
+   ----------------------------------------------------------------------------- */
+.page-section#gallery {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#galleryStage,
+.stage#galleryStage {
+  position: relative;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  container-type: inline-size !important;
+  background-color: #FAF8F5;
+}
+
+/* Background Image: 100% visible, ZERO cutting (0% cropped) and ZERO stretching (0% distorted) */
+#galleryStage .stage-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  object-position: center center !important;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+/* Ensure reveal items inside gallery are always visible */
+#gallery .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+.gallery-safe {
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: clamp(16px, 3vh, 26px) 0 !important;
+  margin: auto 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  z-index: 10;
+}
+
+.gallery-header {
+  padding: 0 20px;
+  width: 100%;
+  text-align: center;
+  margin-bottom: clamp(4px, 1cqh, 8px);
+}
+
+#gallery .section-title {
+  font-size: clamp(24px, 7.4cqw, 38.4px);
+}
+
+#gallery .safe-caption {
+  font-size: clamp(12px, 3.4cqw, 15.6px);
+}
+
+#gallery .safe-micro-tag {
+  font-size: clamp(9.6px, 2.9cqw, 13.2px);
+}
+
+.gallery-deck-container {
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  margin: 0 auto;
+}
+
+/* Stack Stage - Holds the cards */
+.gallery-deck-stage {
+  width: 100%;
+  max-width: 100vw;
+  height: clamp(270px, 40vh, 330px);
+  min-height: 250px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.gallery-deck-cards {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Individual Stack Card */
+.gallery-deck-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(190px, 52vw, 235px);
+  aspect-ratio: 3 / 4;
+  height: clamp(245px, 68vw, 305px);
+  border-radius: clamp(85px, 25cqw, 120px) clamp(85px, 25cqw, 120px) 16px 16px;
+  transform: translate(-50%, -50%);
+  transform-origin: center 85%;
+  transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.35s ease, filter 0.35s ease, box-shadow 0.35s ease;
+  cursor: grab;
+  will-change: transform, opacity;
+  box-sizing: border-box;
+}
+
+.gallery-deck-card:active {
+  cursor: grabbing;
+}
+
+.gallery-deck-card.is-dragging {
+  transition: none !important;
+}
+
+.gallery-deck-card.is-swiping-out {
+  transition: transform 0.32s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.32s ease !important;
+}
+
+/* Royal Arch Portal Frame */
+.gallery-deck-arch {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: clamp(85px, 25cqw, 120px) clamp(85px, 25cqw, 120px) 16px 16px;
+  overflow: hidden;
+  background: #FDF4E7;
+  border: 2px solid var(--gold-bright);
+  box-shadow: 0 10px 28px rgba(74, 46, 53, 0.18);
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.gallery-deck-card.is-active .gallery-deck-arch {
+  border: 3px solid var(--gold);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.96), 0 16px 40px rgba(74, 46, 53, 0.26), 0 0 20px rgba(184, 146, 58, 0.35);
+}
+
+.gallery-deck-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  display: block;
+  pointer-events: none;
+  transition: transform 0.5s ease;
+}
+
+.gallery-deck-card.is-active:hover .gallery-deck-img {
+  transform: scale(1.03);
+}
+
+/* Caption Vignette Overlay */
+.gallery-deck-vignette {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 28px 12px 12px;
+  background: linear-gradient(to top, rgba(74, 46, 53, 0.9) 0%, rgba(74, 46, 53, 0.45) 60%, transparent 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.gallery-deck-caption {
+  font-family: var(--font-caps);
+  font-size: clamp(9px, 2.5cqw, 11px);
+  color: #FFFFFF;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  background: rgba(140, 106, 31, 0.72);
+  backdrop-filter: blur(4px);
+  padding: 4px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Controls & Dots */
+.gallery-deck-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.gallery-deck-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #FFFDF7;
+  border: 1.5px solid var(--gold-bright);
+  color: var(--gold-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(74, 46, 53, 0.12);
+  transition: all 0.25s ease;
+}
+
+.gallery-deck-btn:hover {
+  background: var(--gold-gradient);
+  color: #FFFFFF;
+  border-color: transparent;
+  transform: scale(1.08);
+}
+
+.gallery-deck-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.deck-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(184, 146, 58, 0.3);
+  border: 1px solid rgba(184, 146, 58, 0.5);
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.deck-dot.is-active {
+  width: 20px;
+  border-radius: 10px;
+  background: var(--gold-gradient);
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(184, 146, 58, 0.4);
+}
+
+.gallery-tap-hint {
+  margin: 10px auto 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+/* Lightbox Modal */
+.lightbox-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(40, 24, 28, 0.94);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  font-size: 32px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.lightbox-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  max-width: 90vw;
+  max-height: 85vh;
+}
+
+.lightbox-nav {
+  background: rgba(253, 248, 236, 0.2);
+  border: 1px solid var(--gold-bright);
+  color: #FFFFFF;
+  font-size: 28px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.lightbox-img-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 70vw;
+  max-height: 80vh;
+}
+
+.lightbox-img {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border: 2px solid var(--gold-bright);
+  border-radius: 8px;
+}
+
+.lightbox-meta {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px;
+  color: var(--ivory);
+  font-family: var(--font-caps);
+  font-size: 12px;
+}
+
+/* -----------------------------------------------------------------------------
+   15. SECTION 8: RSVP FORM - LUXURY FROSTED GLASS PAVILION
+   ----------------------------------------------------------------------------- */
+.page-section#rsvp {
+  height: auto !important;
+  min-height: 100dvh;
+  min-height: 100vh;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow: visible !important;
+  /* Warm Royal Sunset Glow: Champagne Silk -> Spiced Peach -> Rose Nectar */
+  background: linear-gradient(168deg, #FFFDF8 0%, #FDF1E3 35%, #FCE3EB 70%, #F7D2DC 100%);
+}
+
+#rsvpStage,
+.stage#rsvpStage {
+  width: min(100vw, calc(100dvh * var(--ar, 0.55815)));
+  min-height: 100dvh;
+  height: auto !important;
+  max-height: none !important;
+  position: relative;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  container-type: inline-size !important;
+  /* Warm Royal Sunset Glow */
+  background: linear-gradient(168deg, #FFFDF8 0%, #FDF1E3 35%, #FCE3EB 70%, #F7D2DC 100%);
+  padding: clamp(28px, 4.5vh, 46px) clamp(16px, 4.5cqw, 24px) !important;
+}
+
+#rsvpStage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 16% 18%, rgba(217, 182, 90, 0.18) 0%, transparent 45%),
+    radial-gradient(circle at 84% 82%, rgba(214, 69, 127, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.45) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+#rsvp .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+.rsvp-safe {
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  z-index: 10;
+}
+
+/* Luxury Frosted Glass Pavilion Card */
+.rsvp-glass-pavilion {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 253, 248, 0.76);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1.5px solid rgba(217, 182, 90, 0.55);
+  border-radius: 26px;
+  padding: clamp(20px, 4cqw, 28px);
+  box-shadow: 
+    0 16px 45px rgba(74, 46, 53, 0.12),
+    0 0 28px rgba(217, 182, 90, 0.18),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Top RSVP Event Artwork */
+.rsvp-art-frame {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.rsvp-art-img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: clamp(140px, 36cqw, 200px);
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 10px 22px rgba(184, 146, 58, 0.22));
+  transition: transform 0.4s ease, filter 0.4s ease;
+  animation: gentleRsvpFloat 4s ease-in-out infinite alternate;
+}
+
+@keyframes gentleRsvpFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-3.5px); }
+}
+
+.rsvp-art-frame:hover .rsvp-art-img {
+  transform: scale(1.03) translateY(-3px);
+  filter: drop-shadow(0 14px 28px rgba(184, 146, 58, 0.3));
+}
+
+/* Pavilion Crown & Heading */
+.pavilion-crown {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.pavilion-tag {
+  font-family: var(--font-caps);
+  font-size: clamp(10.5px, 2.8cqw, 13px);
+  color: var(--burgundy-deep);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.pavilion-title {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 7.9cqw, 38px);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 2px 0 6px;
+  line-height: 1.15;
+}
+
+.pavilion-deadline-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 16px;
+  border-radius: 18px;
+  background: rgba(217, 182, 90, 0.14);
+  border: 1px solid rgba(217, 182, 90, 0.4);
+  color: var(--gold-dark);
+  font-family: var(--font-caps);
+  font-size: clamp(9.5px, 2.5cqw, 11.5px);
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+/* Pavilion Form Segments */
+.pavilion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pavilion-segment {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.pavilion-segment-label {
+  font-family: var(--font-caps);
+  font-size: clamp(10.5px, 2.8cqw, 13px);
+  letter-spacing: 0.14em;
+  color: var(--burgundy-deep);
+  text-transform: uppercase;
+  font-weight: 600;
+  display: block;
+}
+
+/* SEGMENT 1: Attendance Card Grid */
+.attendance-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.attendance-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12px 8px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1.5px solid rgba(184, 146, 58, 0.35);
+  cursor: pointer;
+  transition: all 0.28s ease;
+  user-select: none;
+  overflow: hidden;
+}
+
+.attendance-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.attendance-card-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+  transition: transform 0.25s ease;
+}
+
+.attendance-card-title {
+  font-family: var(--font-caps);
+  font-size: clamp(10.5px, 2.9cqw, 13px);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--burgundy-deep);
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.attendance-card-subtitle {
+  font-family: var(--font-sans);
+  font-size: clamp(9.5px, 2.5cqw, 11.5px);
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.attendance-check-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: var(--gold-gradient);
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(184, 146, 58, 0.4);
+}
+
+.attendance-card.is-selected,
+.attendance-card:has(input[type="radio"]:checked) {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--gold);
+  box-shadow: 0 6px 18px rgba(184, 146, 58, 0.25), inset 0 0 0 1px rgba(217, 182, 90, 0.5);
+  transform: translateY(-2px);
+}
+
+.attendance-card.is-selected .attendance-check-badge,
+.attendance-card:has(input[type="radio"]:checked) .attendance-check-badge {
+  display: flex;
+}
+
+.attendance-card:hover {
+  border-color: var(--gold);
+}
+
+.attendance-card:hover .attendance-card-icon {
+  transform: scale(1.12);
+}
+
+/* SEGMENT 2: Contact Inputs Grid */
+.contact-inputs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (min-width: 480px) {
+  .contact-inputs-grid {
+    flex-direction: row;
+    gap: 12px;
+  }
+}
+
+.pavilion-field-box {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.pavilion-field-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 17px;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.pavilion-input {
+  width: 100%;
+  padding: 11px 14px 11px 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(184, 146, 58, 0.4);
+  background: rgba(255, 255, 255, 0.85);
+  font-family: var(--font-sans);
+  font-size: clamp(12.5px, 3.5cqw, 15.5px);
+  color: var(--text-primary);
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.25s ease;
+}
+
+.pavilion-input:focus {
+  background: #FFFFFF;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(217, 182, 90, 0.2);
+}
+
+.form-error {
+  position: absolute;
+  bottom: -17px;
+  left: 6px;
+  font-size: 11px;
+  color: #C0392B;
+  display: none;
+}
+
+.form-error.visible {
+  display: block;
+}
+
+/* Segment Header Row */
+.segment-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.guests-count-badge {
+  font-family: var(--font-caps);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--rose-accent);
+  text-transform: uppercase;
+}
+
+.events-hint-note {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* SEGMENT 3: Number of Guests Field */
+input[type="number"].pavilion-input::-webkit-outer-spin-button,
+input[type="number"].pavilion-input::-webkit-inner-spin-button {
+  opacity: 0.65;
+  cursor: pointer;
+}
+
+/* SEGMENT 4: Ceremonies Chips Grid */
+.ceremonies-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ceremony-chip {
+  cursor: pointer;
+  user-select: none;
+}
+
+.ceremony-chip input[type="checkbox"] {
+  display: none;
+}
+
+.ceremony-chip-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(184, 146, 58, 0.35);
+  transition: all 0.25s ease;
+}
+
+.ceremony-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(184, 146, 58, 0.5);
+  transition: all 0.25s ease;
+}
+
+.ceremony-name {
+  font-family: var(--font-caps);
+  font-size: clamp(9.5px, 2.6cqw, 12px);
+  letter-spacing: 0.1em;
+  color: var(--burgundy-deep);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ceremony-date {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.ceremony-chip input:checked + .ceremony-chip-inner {
+  background: var(--gold-gradient);
+  border-color: var(--gold-bright);
+  box-shadow: 0 3px 8px rgba(184, 146, 58, 0.3);
+}
+
+.ceremony-chip input:checked + .ceremony-chip-inner .ceremony-dot {
+  background: #FFFFFF;
+}
+
+.ceremony-chip input:checked + .ceremony-chip-inner .ceremony-name,
+.ceremony-chip input:checked + .ceremony-chip-inner .ceremony-date {
+  color: #FFFFFF;
+}
+
+/* Submit Button */
+.btn-pavilion-submit {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  border-radius: 26px;
+  border: none;
+  background: var(--gold-gradient);
+  color: #FFFFFF;
+  font-family: var(--font-caps);
+  font-size: clamp(11.5px, 3.2cqw, 14.5px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(184, 146, 58, 0.38), 0 0 12px rgba(217, 182, 90, 0.3);
+  margin-top: 6px;
+  transition: all 0.25s ease;
+}
+
+.btn-pavilion-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(184, 146, 58, 0.45);
+}
+
+.btn-wa-icon {
+  flex-shrink: 0;
+  width: 21px;
+  height: 21px;
+}
+
+.btn-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: btnShimmer 3s infinite;
+}
+
+@keyframes btnShimmer {
+  0% { left: -100%; }
+  35%, 100% { left: 150%; }
+}
+
+/* Success Card */
+.pavilion-success-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 12px;
+}
+
+.success-royal-icon {
+  font-size: 34px;
+  color: var(--gold-bright);
+  margin-bottom: 8px;
+  animation: pulseGold 2s infinite ease-in-out;
+}
+
+@keyframes pulseGold {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(244, 208, 111, 0.4)); }
+  50% { transform: scale(1.15); filter: drop-shadow(0 0 14px rgba(244, 208, 111, 0.8)); }
+}
+
+.success-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  color: var(--gold-dark);
+  margin: 6px 0;
+}
+
+.success-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--text-primary);
+  line-height: 1.45;
+  margin-bottom: 16px;
+}
+
+.btn-gold-outline {
+  padding: 10px 22px;
+  border-radius: 20px;
+  background: none;
+  border: 1px solid var(--gold);
+  color: var(--gold-dark);
+  font-family: var(--font-caps);
+  font-size: 12.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-gold-outline:hover {
+  background: var(--gold-gradient);
+  color: #FFFFFF;
+  border-color: transparent;
+}
+
+.pavilion-footer-note {
+  margin-top: 14px;
+  text-align: center;
+}
+
+#rsvp .pavilion-footer-note .safe-micro-tag {
+  font-size: clamp(9.5px, 2.8cqw, 13px);
+}
+
+/* -----------------------------------------------------------------------------
+   16. SECTION 9: FOOTER (Compact Elegant Layout)
+   ----------------------------------------------------------------------------- */
+.page-section#footer {
+  height: auto !important;
+  min-height: auto !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow: visible !important;
+  background: var(--ivory);
+}
+
+#footerStage,
+.stage#footerStage {
+  width: min(100vw, calc(100dvh * var(--ar, 0.55815)));
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  position: relative;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  container-type: inline-size !important;
+  padding: clamp(34px, 5vh, 48px) clamp(16px, 4cqw, 24px) clamp(24px, 3.5vh, 34px) !important;
+  gap: 12px;
+}
+
+#footerStage .stage-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  z-index: 1;
+  pointer-events: none;
+}
+
+#footerStage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 253, 248, 0.45);
+  z-index: 2;
+  pointer-events: none;
+}
+
+#footerStage .upper-arch-zone,
+#footerStage .footer-safe,
+#footerStage .lower-center-zone {
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  z-index: 10;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+#footerStage .upper-arch-zone .sacred-shloka {
+  font-size: clamp(12px, 3.84cqw, 17px);
+}
+
+#footer .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+}
+
+.footer-center-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 7px;
+}
+
+.footer-thank-you {
+  font-family: var(--font-script);
+  font-size: clamp(38px, 10.8cqw, 58px);
+  color: var(--gold-dark);
+  line-height: 1.45;
+  background: var(--gold-gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  padding: 10px 18px;
+  margin: 8px 0 6px;
+  overflow: visible;
+}
+
+.footer-names {
+  font-family: var(--font-script);
+  font-size: clamp(32px, 8.8cqw, 44px);
+  color: var(--rose-pink);
+  margin: 0;
+  line-height: 1.15;
+}
+
+.hashtag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 18px;
+  border-radius: 24px;
+  background: rgba(253, 248, 236, 0.9);
+  border: 1.2px solid var(--gold-bright);
+  cursor: pointer;
+  margin: 4px 0;
+  transition: transform 0.2s ease;
+  box-shadow: 0 3px 10px rgba(184, 146, 58, 0.2);
+}
+
+.hashtag-pill:hover {
+  transform: scale(1.05);
+}
+
+.hashtag-text {
+  font-family: var(--font-caps);
+  font-size: clamp(11px, 3.1cqw, 13.5px);
+  color: var(--gold-dark);
+  letter-spacing: 0.12em;
+}
+
+.hashtag-copy-icon {
+  font-size: 14px;
+}
+
+.footer-blessing-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(14px, 3.6cqw, 17px);
+  line-height: 1.48;
+  color: var(--text-secondary);
+  max-width: 90%;
+  margin: 4px 0 10px;
+}
+
+.footer-action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-footer-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 24px;
+  background: var(--gold-gradient);
+  color: #FFFFFF;
+  border: none;
+  font-family: var(--font-caps);
+  font-size: clamp(10px, 2.8cqw, 12px);
+  letter-spacing: 0.14em;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(184, 146, 58, 0.28);
+  transition: transform 0.2s ease;
+}
+
+.btn-footer-action svg {
+  width: 19px;
+  height: 19px;
+}
+
+.btn-footer-action:hover {
+  transform: translateY(-2px);
+}
+
+.footer-credit {
+  font-family: var(--font-sans);
+  font-size: clamp(10px, 2.6cqw, 12px);
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+}
+
+/* -----------------------------------------------------------------------------
+   17. REVEAL ANIMATIONS (IntersectionObserver Staggered Reveal)
+   ----------------------------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.75s var(--ease-smooth), transform 0.75s var(--ease-smooth);
+}
+
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.stagger-1 { transition-delay: 0.08s; }
+.stagger-2 { transition-delay: 0.22s; }
+.stagger-3 { transition-delay: 0.38s; }
+
+/* Toast Notification Alert */
+.toast-notification {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(40px);
+  background: rgba(74, 46, 53, 0.92);
+  color: #FFFFFF;
+  font-family: var(--font-caps);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  padding: 10px 20px;
+  border-radius: 24px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999999;
+  transition: all 0.35s var(--ease-smooth);
+}
+
+.toast-notification.active {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* -----------------------------------------------------------------------------
+   FLOATING BACKGROUND MUSIC TOGGLE BUTTON
+   ----------------------------------------------------------------------------- */
+.floating-music-btn {
+  position: fixed;
+  top: 22px;
+  right: 22px;
+  z-index: 99990;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-gold-subtle);
+  background: rgba(255, 253, 248, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--burgundy-deep);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(74, 46, 53, 0.16), 0 0 10px rgba(217, 182, 90, 0.2);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 0;
+  outline: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.floating-music-btn:hover {
+  transform: scale(1.1) rotate(10deg);
+  border-color: var(--gold-bright);
+  box-shadow: 0 6px 22px rgba(184, 146, 58, 0.32), 0 0 14px rgba(217, 182, 90, 0.35);
+}
+
+.floating-music-btn:active {
+  transform: scale(0.92);
+}
+
+/* Golden Disc Vinyl Orbit Ring */
+.music-disc-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px dashed rgba(217, 182, 90, 0.4);
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
+
+.floating-music-btn.is-playing .music-disc-ring {
+  border-color: rgba(217, 182, 90, 0.8);
+  animation: discSpin 8s linear infinite;
+}
+
+@keyframes discSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.music-icon-wrap {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Classical Note Icon */
+.music-note-icon {
+  width: 19px;
+  height: 19px;
+  color: var(--gold-dark);
+  transition: all 0.3s ease;
+}
+
+/* Equalizer Bars: visible only when music is playing */
+.eq-bar {
+  display: none;
+  width: 2.5px;
+  border-radius: 2px;
+  background: var(--gold-gradient);
+  margin: 0 1px;
+}
+
+.floating-music-btn.is-playing .music-note-icon {
+  display: none;
+}
+
+.floating-music-btn.is-playing .eq-bar {
+  display: block;
+  animation: eqBounce 1.2s ease-in-out infinite alternate;
+}
+
+.eq-bar-1 { height: 10px; animation-delay: 0.1s !important; }
+.eq-bar-2 { height: 16px; animation-delay: 0.3s !important; }
+.eq-bar-3 { height: 12px; animation-delay: 0.5s !important; }
+.eq-bar-4 { height: 8px; animation-delay: 0.2s !important; }
+
+@keyframes eqBounce {
+  0% { transform: scaleY(0.3); }
+  100% { transform: scaleY(1.15); }
+}
+
+/* Muted / Paused diagonal strike line */
+.floating-music-btn.is-muted::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 2px;
+  background: var(--rose-pink);
+  transform: rotate(-45deg);
+  border-radius: 1px;
+}
+
+/* -----------------------------------------------------------------------------
+   17.1 DECORATIVE BACKGROUND FLORAL MOTIFS (COUPLE & STORY)
+   ----------------------------------------------------------------------------- */
+.stage-deco-flora {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2; /* Sits gently behind cards (z-index: 5) and safe zone content */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+}
+
+.deco-flower-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 14px rgba(74, 46, 53, 0.16));
+  opacity: 0.9;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Couple Intro Flora Placements */
+.deco-flower-top-left {
+  top: 4%;
+  left: -2%;
+  width: clamp(90px, 24cqw, 155px);
+  transform: rotate(-12deg);
+  animation: floraSwayLeft 7.5s ease-in-out infinite alternate;
+}
+
+.deco-flower-mid-right {
+  top: 48%;
+  right: -3%;
+  width: clamp(80px, 20cqw, 140px);
+  transform: rotate(18deg);
+  animation: floraSwayRight 8.5s ease-in-out 1s infinite alternate;
+}
+
+.deco-flower-bottom-left {
+  bottom: 3%;
+  left: -1%;
+  width: clamp(85px, 22cqw, 145px);
+  transform: rotate(8deg);
+  animation: floraSwayLeft 9s ease-in-out 0.5s infinite alternate;
+}
+
+/* Couple Story Flora Placements */
+.deco-flower-story-top-right {
+  top: 3%;
+  right: -2%;
+  width: clamp(85px, 22cqw, 150px);
+  transform: rotate(14deg);
+  animation: floraSwayRight 8s ease-in-out infinite alternate;
+}
+
+.deco-flower-story-mid-left {
+  top: 42%;
+  left: -4%;
+  width: clamp(95px, 25cqw, 160px);
+  transform: rotate(-15deg);
+  animation: floraSwayLeft 7s ease-in-out 1.2s infinite alternate;
+}
+
+.deco-flower-story-bottom-right {
+  bottom: 2%;
+  right: -1%;
+  width: clamp(90px, 23cqw, 155px);
+  transform: rotate(10deg);
+  animation: floraSwayRight 9s ease-in-out 0.8s infinite alternate;
+}
+
+@keyframes floraSwayLeft {
+  0% {
+    transform: translate(0, 0) rotate(-12deg);
+  }
+  50% {
+    transform: translate(3px, -5px) rotate(-8deg);
+  }
+  100% {
+    transform: translate(-3px, 4px) rotate(-15deg);
+  }
+}
+
+@keyframes floraSwayRight {
+  0% {
+    transform: translate(0, 0) rotate(14deg);
+  }
+  50% {
+    transform: translate(-4px, -6px) rotate(18deg);
+  }
+  100% {
+    transform: translate(2px, 5px) rotate(11deg);
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   18. ACCESSIBILITY & PREFERS-REDUCED-MOTION
+   ----------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .entrance-overlay.dissolving {
+    opacity: 0 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+  .hero-line {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  #heroStage .stage-bg {
+    transform: none !important;
+    filter: none !important;
+  }
+}
