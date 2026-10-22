@@ -13,27 +13,28 @@
 const CONFIG = {
   // Couple Information
   groom: {
-    name: "Aarav",
-    fullName: "Aarav Sharma",
-    parents: "Son of Mr. Vikram & Mrs. Meenakshi Sharma",
+    name: "Sunil",
+    fullName: "Sunil Chaugna",
+    parents: "Son of Mr. Ganpat and Mrs. Sushila Chaugna",
     tagline: "Architect & Heritage Enthusiast",
     bio: "A visionary designer drawn to royal arches and soulful journeys, ready for life's greatest collaboration.",
     photo: "Assets/Couple IMages/Couple_image.webp"
   },
   bride: {
-    name: "Ananya",
-    fullName: "Ananya Verma",
-    parents: "Daughter of Mr. Rajesh & Mrs. Sunita Verma",
+    name: "Anamika",
+    fullName: "Anamika Mehra",
+    parents: "Daughter of Mr. Jetharam and Mrs. Munni Devi Mehra",
     tagline: "Classical Artist & Educator",
     bio: "A graceful soul who brings warmth, music, and vibrant colors to every heart she touches.",
     photo: "Assets/Couple IMages/Couple_image1.webp"
   },
 
   // Wedding Date & Time
-  weddingDate: "2027-02-14T11:30:00", // ISO 8601 for live countdown
-  weddingDateDisplay: "Sunday, 14 February 2027",
-  weddingCity: "Udaipur, Rajasthan",
-  hashtag: "#AaravWedsAnanya",
+  weddingDate: "2026-12-02T11:30:00", // ISO 8601 for live countdown
+  weddingDateDisplay: "Wednesday, 02 December 2026",
+  weddingCity: "Nagaur, Rajasthan",
+  weddingVenue: "Chaugna Farm House, Nagaur",
+  hashtag: "#SunilWedsAnamika",
   websiteUrl: "https://bow-bouquet.vs022480o.workers.dev/",
 
   // RSVP Contact & Form Endpoint
@@ -226,6 +227,22 @@ function applyConfigToDOM() {
   const footerNames = document.querySelector('.footer-names');
   if (footerNames && CONFIG.groom.name && CONFIG.bride.name) {
     footerNames.textContent = `${CONFIG.groom.name} & ${CONFIG.bride.name}`;
+  }
+
+  const msgNames = document.querySelectorAll('#message .message-person-name');
+  const msgLineages = document.querySelectorAll('#message .message-person-lineage');
+  if (msgNames.length >= 2) {
+    if (CONFIG.groom.fullName) msgNames[0].textContent = CONFIG.groom.fullName;
+    if (CONFIG.bride.fullName) msgNames[1].textContent = CONFIG.bride.fullName;
+  }
+  if (msgLineages.length >= 2) {
+    if (CONFIG.groom.parents) msgLineages[0].textContent = CONFIG.groom.parents;
+    if (CONFIG.bride.parents) msgLineages[1].textContent = CONFIG.bride.parents;
+  }
+
+  const revealVenue = document.querySelector('.reveal-venue');
+  if (revealVenue && CONFIG.weddingVenue) {
+    revealVenue.textContent = CONFIG.weddingVenue;
   }
 }
 

@@ -623,9 +623,9 @@ body.scroll-locked {
 /* Precise Stagger Delays: Line 1 through Line 8 */
 .hero-line-1 { transition-delay: 0.35s; } /* Shloka */
 .hero-line-2 { transition-delay: 0.65s; } /* Invitation tag */
-.hero-line-3 { transition-delay: 0.95s; } /* Groom: Aarav */
+.hero-line-3 { transition-delay: 0.95s; } /* Groom: Sunil */
 .hero-line-4 { transition-delay: 1.20s; } /* & */
-.hero-line-5 { transition-delay: 1.45s; } /* Bride: Ananya */
+.hero-line-5 { transition-delay: 1.45s; } /* Bride: Anamika */
 .hero-line-6 { transition-delay: 1.75s; } /* Gold divider */
 .hero-line-7 { transition-delay: 2.00s; } /* Invitation text */
 .hero-line-8 { transition-delay: 2.25s; } /* Scroll cue */
