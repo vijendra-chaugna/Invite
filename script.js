@@ -84,6 +84,17 @@ const CONFIG = {
       image: "Assets/Events/Sangeet-event.webp"
     },
     {
+      title: "Mayra",
+      dateStr: "02 Dec 2026 • 12:00 PM Onwards",
+      startIso: "2026-12-02T12:00:00",
+      endIso: "2026-12-02T16:00:00",
+      venue: "Chaugna Farmhouse, Nagaur",
+      dressCode: "Traditional Marwari Dress",
+      desc: "A sacred Marwari maternal celebration filled with heartfelt traditions, auspicious blessings, and joyful welcome.",
+      mapUrl: "https://maps.google.com/?q=Chaugna+Farmhouse+Nagaur",
+      image: "Assets/Events/mayra-event.webp"
+    },
+    {
       title: "Shubh Vivah",
       dateStr: "Wednesday, 02 Dec 2026 • Baraat 4:00 PM | Varmala 9:00 PM",
       startIso: "2026-12-02T16:00:00",
@@ -93,17 +104,6 @@ const CONFIG = {
       desc: "Sacred Baraat arrival at 4:00 PM followed by divine Varmala at 9:00 PM and traditional wedding rituals.",
       mapUrl: "https://maps.google.com/?q=Mehra+House+Nagaur",
       image: "Assets/Events/wedding-event.webp"
-    },
-    {
-      title: "Mayra",
-      dateStr: "02 Dec 2026 • 12:00 PM Onwards",
-      startIso: "2026-12-02T12:00:00",
-      endIso: "2026-12-02T16:00:00",
-      venue: "Chaugna Farmhouse, Nagaur",
-      dressCode: "Traditional Marwari Dress",
-      desc: "A sacred Marwari maternal celebration filled with heartfelt traditions, auspicious blessings, and joyful welcome.",
-      mapUrl: "https://maps.google.com/?q=Chaugna+Farmhouse+Nagaur",
-      image: "Assets/Events/reception-event.webp"
     }
   ],
 
