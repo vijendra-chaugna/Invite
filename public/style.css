@@ -1966,6 +1966,10 @@ body.scroll-locked {
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+.mayra-art-frame {
+  width: clamp(260px, 78cqw, 390px);
+}
+
 .grand-art-frame {
   width: clamp(210px, 64cqw, 320px);
   border: none !important;
@@ -1987,6 +1991,11 @@ body.scroll-locked {
   display: block;
   filter: drop-shadow(0 10px 22px rgba(184, 146, 58, 0.18));
   transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.5s ease;
+}
+
+.mayra-art-frame .event-art-img,
+.mayra-art-img {
+  max-height: clamp(280px, 78cqw, 400px);
 }
 
 .grand-art-frame .event-art-img {
