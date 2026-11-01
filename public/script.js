@@ -109,12 +109,11 @@ const CONFIG = {
 
   // Gallery Photos
   gallery: [
-    { src: "Assets/Couple IMages/Couple_image.webp", caption: "Eternal Beginnings" },
-    { src: "Assets/Couple IMages/Couple_image1.webp", caption: "Laughter & Grace" },
-    { src: "Assets/Couple IMages/Couple_image2.webp", caption: "By The Palaces" },
-    { src: "Assets/Couple IMages/Couple_image3.webp", caption: "Shared Glances" },
-    { src: "Assets/Couple IMages/Couple_image4.webp", caption: "Golden Hour Glow" },
-    { src: "Assets/Couple IMages/Couple_image5.webp", caption: "Forever in Love" }
+    { src: "Assets/Slide/1.png", caption: "Eternal Beginnings" },
+    { src: "Assets/Slide/2.png", caption: "Laughter & Grace" },
+    { src: "Assets/Slide/3.png", caption: "By The Palaces" },
+    { src: "Assets/Slide/4.png", caption: "Shared Glances" },
+    { src: "Assets/Slide/5.png", caption: "Forever in Love" }
   ]
 };
 
