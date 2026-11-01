@@ -18,7 +18,7 @@ const CONFIG = {
     parents: "Son of Mr. Ganpat and Mrs. Sushila Chaugna",
     tagline: "",
     bio: "A visionary designer drawn to royal arches and soulful journeys, ready for life's greatest collaboration.",
-    photo: "Assets/Couple IMages/Couple_image.webp"
+    photo: "Assets/Main/sunil.png"
   },
   bride: {
     name: "Anamika",
@@ -26,7 +26,7 @@ const CONFIG = {
     parents: "Daughter of Mr. Jetharam and Mrs. Munni Devi Mehra",
     tagline: "",
     bio: "A graceful soul who brings warmth, music, and vibrant colors to every heart she touches.",
-    photo: "Assets/Couple IMages/Couple_image1.webp"
+    photo: "Assets/Main/anamika.png"
   },
 
   // Wedding Date & Time
