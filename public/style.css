@@ -669,17 +669,19 @@ body.scroll-locked {
 /* Lines 3, 4, 5: Couple Names & Ampersand (+10%) */
 .names-wrapper {
   margin: 0.45cqh 0 0.9cqh;
+  overflow: visible;
 }
 
 .hero-names {
   font-family: var(--font-script);
   font-size: clamp(46.2px, 14.85cqw, 70.4px);
-  line-height: 1.15;
+  line-height: 1.2;
   font-weight: 400;
   display: flex;
   flex-direction: column;
   align-items: center;
   color: var(--text-primary);
+  overflow: visible;
 }
 
 .hero-names .groom-name,
@@ -687,9 +689,12 @@ body.scroll-locked {
   background: var(--gold-gradient-text);
   background-size: 200% auto;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 2px 8px rgba(184, 146, 58, 0.25));
   display: inline-block;
+  padding: 0.08em 0.35em 0.12em 0.15em;
+  overflow: visible;
 }
 
 #hero.hero-revealed .hero-line-3,

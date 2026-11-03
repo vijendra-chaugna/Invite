@@ -35,7 +35,7 @@ const CONFIG = {
   weddingCity: "Nagaur, Rajasthan",
   weddingVenue: "Chaugna Farm House, Nagaur",
   hashtag: "#SunilWedsAnamika",
-  websiteUrl: "https://bow-bouquet.vs022480o.workers.dev/",
+  websiteUrl: "https://invite-chi-seven.vercel.app/",
 
   // RSVP Contact & Form Endpoint
   whatsAppNumber: "919876543210", // International format without '+' or spaces
@@ -112,7 +112,7 @@ const CONFIG = {
     { src: "Assets/Slide/1.png", caption: "Eternal Beginnings" },
     { src: "Assets/Slide/2.png", caption: "Laughter & Grace" },
     { src: "Assets/Slide/3.png", caption: "By The Palaces" },
-    { src: "Assets/Slide/4.png", caption: "Shared Glances" },
+    { src: "Assets/Slide/6.png", caption: "Shared Glances" },
     { src: "Assets/Slide/5.png", caption: "Forever in Love" }
   ]
 };
