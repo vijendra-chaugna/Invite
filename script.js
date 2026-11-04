@@ -35,7 +35,7 @@ const CONFIG = {
   weddingCity: "Nagaur, Rajasthan",
   weddingVenue: "Chaugna Farm House, Nagaur",
   hashtag: "#SunilWedsAnamika",
-  websiteUrl: "https://invite-chi-seven.vercel.app/",
+  websiteUrl: "https://sunil-anamika-wedding-invite.02-12-2026.workers.dev/",
 
   // RSVP Contact & Form Endpoint
   whatsAppNumber: "919876543210", // International format without '+' or spaces
