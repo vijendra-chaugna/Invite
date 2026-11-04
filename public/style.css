@@ -3279,6 +3279,143 @@ input[type="number"].pavilion-input::-webkit-inner-spin-button {
   gap: 7px;
 }
 
+.organisers-royalty-tag {
+  font-family: var(--font-caps);
+  font-size: clamp(9.5px, 2.5cqw, 11.5px);
+  letter-spacing: 0.22em;
+  color: var(--gold-dark);
+  text-transform: uppercase;
+  font-weight: 600;
+  display: block;
+  margin-top: 4px;
+}
+
+.footer-invite-title {
+  font-family: var(--font-script);
+  font-size: clamp(38px, 10.8cqw, 56px);
+  line-height: 1.25;
+  color: var(--gold-dark);
+  background: var(--gold-gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  padding: 4px 16px;
+  margin: 0;
+  overflow: visible;
+}
+
+.organisers-invitation-box {
+  background: rgba(255, 253, 248, 0.92);
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  box-shadow: 0 10px 32px rgba(140, 109, 35, 0.12), 0 2px 8px rgba(140, 109, 35, 0.06);
+  border-radius: 20px;
+  padding: clamp(16px, 4cqw, 24px) clamp(14px, 3.5cqw, 22px);
+  margin: 4px 0 10px;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  position: relative;
+}
+
+.organisers-invitation-box::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 16px;
+  pointer-events: none;
+}
+
+.organisers-lead-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(14px, 3.7cqw, 17px);
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0 0 2px;
+  text-align: center;
+}
+
+.organisers-names-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(8px, 2.2cqw, 12px);
+  width: 100%;
+  margin: 12px 0 8px;
+}
+
+@media (max-width: 360px) {
+  .organisers-names-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.organiser-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(253, 248, 236, 0.9) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.38);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(184, 146, 58, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.organiser-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(184, 146, 58, 0.16);
+  border-color: var(--gold-bright);
+}
+
+.organiser-icon {
+  font-size: 13px;
+  color: var(--gold-bright);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.organiser-details {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.organiser-name {
+  font-family: var(--font-serif);
+  font-size: clamp(12.5px, 3.3cqw, 15px);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+}
+
+.organiser-role {
+  font-family: var(--font-caps);
+  font-size: clamp(8px, 2cqw, 9.5px);
+  color: var(--gold-dark);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+.organisers-closing-note {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(13px, 3.3cqw, 15.5px);
+  line-height: 1.45;
+  color: var(--text-secondary);
+  margin: 4px 0 0;
+  text-align: center;
+}
+
 .footer-thank-you {
   font-family: var(--font-script);
   font-size: clamp(38px, 10.8cqw, 58px);
